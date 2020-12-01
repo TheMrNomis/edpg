@@ -3,11 +3,10 @@
 #include <opencv2/imgcodecs.hpp>
 #include <iostream>
 
+#include "log.h"
+
 int main(int argc, char** argv) {
-    if(argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <input> <output>" << std::endl;
-        return EXIT_FAILURE;
-    }
+    Log::ensure(argc == 3) << "Usage: " << argv[0] << " <input> <output>";
 
     cv::String inputFilename = argv[1];
     cv::String outputFilename = argv[2];
@@ -15,18 +14,10 @@ int main(int argc, char** argv) {
     cv::String face_cascade_name = cv::samples::findFile("haarcascades/haarcascade_frontalface_alt.xml");
 
     cv::CascadeClassifier face_cascade;
-    if(!face_cascade.load(face_cascade_name))
-    {
-        std::cerr << "Cannot load face classifier" << std::endl;
-        return EXIT_FAILURE;
-    }
+    Log::ensure(face_cascade.load(face_cascade_name)) << "Cannot load face classifier";
 
     cv::Mat img = cv::imread(inputFilename, cv::IMREAD_COLOR);
-    if(img.empty())
-    {
-        std::cerr << "Cannot read image \"" << inputFilename << "\"" << std::endl;
-        return EXIT_FAILURE;
-    }
+    Log::ensure(!img.empty()) << "Cannot read image \"" << inputFilename << "\"";
 
     std::vector<cv::Rect> faces;
     face_cascade.detectMultiScale(img, faces);
